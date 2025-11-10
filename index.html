@@ -30,9 +30,11 @@
       padding: 24px 32px;
       border-radius: 16px;
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
-      width: 90%;
+      width: 100%;
       max-width: 800px;
       margin-top: 20px;
+      
+      box-sizing: border-box;
     }
 
     label {
@@ -161,7 +163,7 @@ ${JSON.stringify(dados).slice(0, 8000)}
 
     const result = await res.json();
     const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta da IA.";
-    saida.innerHTML = "<pre>" + text + "</pre>";
+   //saida.innerHTML = "<pre>" + text + "</pre>";
 
     const start = text.indexOf("{");
     const end = text.lastIndexOf("}");

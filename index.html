@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Visualizador IA com Gemini 2.5 Flash</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .container {
+      background: #1e293b;
+      padding: 24px 32px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+      width: 90%;
+      max-width: 800px;
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #a5b4fc;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #f1f5f9;
+      margin-bottom: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #38bdf8;
+      outline: none;
+    }
+
+    button {
+      background: linear-gradient(90deg, #06b6d4, #3b82f6);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      opacity: 0.9;
+    }
+
+    #saida {
+      margin-top: 24px;
+    }
+
+    .chart-card {
+      background: #0f172a;
+      padding: 16px;
+      margin: 20px 0;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
+      animation: fadeIn 0.6s ease;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 300px !important;
+    }
+
+    pre {
+      background: #1e293b;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+      color: #94a3b8;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Visualizador IA com Gemini 2.5 Flash</h1>
+
+  <div class="container">
+    <label>URL do JSON:</label>
+    <input type="url" id="jsonUrl" placeholder="https://example.com/data.json">
+
+    <label>Prompt adicional:</label>
+    <textarea id="promptExtra" rows="3" placeholder="(opcional) Instruções adicionais à IA..."></textarea>
+
+    <button id="btnGerar">Gerar gráficos com IA</button>
+
+    <div id="saida"></div>
+  </div>
+
+<script>
+const GEMINI_API_KEY = "AIzaSyDJLuHCpIDVOzXIzeLVg9OOp2vF2PnSlWg"; // ⚠️ Só para testes locais!
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+document.getElementById("btnGerar").onclick = async () => {
+  const url = document.getElementById("jsonUrl").value.trim();
+  const extra = document.getElementById("promptExtra").value.trim();
+  const saida = document.getElementById("saida");
+  saida.innerHTML = `<p>🔄 Carregando dados e consultando IA...</p>`;
+
+  try {
+    const dados = await (await fetch(url)).json();
+
+    const prompt = `
+Você é um assistente especializado em visualização de dados.
+Com base no JSON abaixo, gere um ou mais gráficos relevantes em formato JSON puro:
+{
+  "charts": [
+    {
+      "id": "grafico1",
+      "type": "bar",
+      "title": "Título do gráfico",
+      "data": {"labels": [], "datasets": [{"label": "Exemplo", "data": []}]},
+      "description": "Breve explicação do que o gráfico mostra."
+    }
+  ]
+}
+${extra ? "Instruções extras: " + extra : ""}
+JSON fornecido:
+${JSON.stringify(dados).slice(0, 8000)}
+`;
+
+    const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
+    });
+
+    const result = await res.json();
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta da IA.";
+    saida.innerHTML = "<pre>" + text + "</pre>";
+
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    const jsonStr = text.slice(start, end + 1);
+    const chartsData = JSON.parse(jsonStr);
+
+    if (chartsData.charts) {
+      chartsData.charts.forEach((ch, i) => {
+        const card = document.createElement("div");
+        card.className = "chart-card";
+        card.innerHTML = `
+          <h3 style="color:#38bdf8">${ch.title}</h3>
+          <p style="color:#cbd5e1">${ch.description}</p>
+          <canvas id="c${i}"></canvas>
+        `;
+        saida.appendChild(card);
+
+        const ctx = document.getElementById("c" + i).getContext("2d");
+        new Chart(ctx, {
+          type: ch.type || "bar",
+          data: ch.data,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { labels: { color: "#e2e8f0" } },
+            },
+            scales: {
+              x: { ticks: { color: "#94a3b8" } },
+              y: { ticks: { color: "#94a3b8" } },
+            }
+          }
+        });
+      });
+    }
+  } catch (err) {
+    saida.innerHTML = `<span style="color:#f87171">Erro: ${err.message}</span>`;
+  }
+};
+</script>
+</body>
+</html>

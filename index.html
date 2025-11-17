@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Visualizador IA com Gemini 2.5 Flash</title>
+  <title>powerauto.ai</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -109,10 +109,10 @@
   </style>
 </head>
 <body>
-  <h1>Visualizador IA com Gemini 2.5 Flash</h1>
+  <h1>POWERAUTO.AI</h1>
 
   <div class="container">
-    <label>URL do JSON:</label>
+    <label>Dados:</label>
     <input type="url" id="jsonUrl" placeholder="https://example.com/data.json">
 
     <label>Prompt adicional:</label>
@@ -138,7 +138,7 @@ document.getElementById("btnGerar").onclick = async () => {
 
     const prompt = `
 Você é um assistente especializado em visualização de dados.
-Com base no JSON abaixo, gere um ou mais gráficos relevantes em formato JSON puro:
+Com base no JSON abaixo, gere um ou mais gráficos relevantes em formato JSON puro(não escreva nada ao redor do json):
 {
   "charts": [
     {

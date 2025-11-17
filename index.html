@@ -160,7 +160,7 @@
   <div class="chat-style-input">
     <input type="url" id="jsonUrl" placeholder="Cole a URL ou selecione arquivos...">
     <span class="file-count" id="fileCount">0 arquivos</span>
-    <button type="button" id="btnEscolherArquivo">📁</button>
+    <button type="button" id="btnEscolherArquivo" style="background-color:  transparent;">📁</button>
     <input type="file" id="fileInput" multiple>
   </div>
 
@@ -246,7 +246,14 @@ ${dataText.slice(0, 10000)}
     const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+            temperature: 0,
+            topP: 1,
+            maxOutputTokens: 4096
+        }
+      })
     });
 
     const result = await res.json();

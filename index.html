@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>POWERAUTO.AI</title>
+<link rel="icon" href="logo2.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   body {
@@ -135,11 +136,23 @@
     border-radius: 12px;
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
     animation: fadeIn 0.6s ease;
+    position: relative;
   }
 
   canvas {
     width: 100% !important;
     height: 300px !important;
+  }
+
+  .logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    opacity: 0.5;
+    z-index: 99;
+    pointer-events: none;
   }
 
   @keyframes fadeIn {
@@ -174,7 +187,7 @@
 
 <script>
 const GEMINI_API_KEY = "AIzaSyDJLuHCpIDVOzXIzeLVg9OOp2vF2PnSlWg"; 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 const fileInput = document.getElementById("fileInput");
 const fileCount = document.getElementById("fileCount");
@@ -273,6 +286,7 @@ ${dataText.slice(0, 10000)}
         card.innerHTML = `
           <h3 style="color:#38bdf8">${ch.title}</h3>
           <p style="color:#cbd5e1">${ch.description}</p>
+          <img class="logo" src="logo.png"></img>
           <canvas id="c${i}"></canvas>
         `;
         saida.appendChild(card);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>POWERAUTO.AI</title>
-<link rel="icon" href="logo2.png">
+<link rel="icon" type="image/png" href="./logo.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   body {
@@ -150,7 +150,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 50%;
-    opacity: 0.5;
+    opacity: 0.75;
     z-index: 99;
     pointer-events: none;
   }
@@ -286,7 +286,7 @@ ${dataText.slice(0, 10000)}
         card.innerHTML = `
           <h3 style="color:#38bdf8">${ch.title}</h3>
           <p style="color:#cbd5e1">${ch.description}</p>
-          <img class="logo" src="logo.png"></img>
+          <img class="logo" src="logo2.png"></img>
           <canvas id="c${i}"></canvas>
         `;
         saida.appendChild(card);
